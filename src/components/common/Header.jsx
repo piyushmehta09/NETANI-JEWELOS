@@ -118,77 +118,70 @@ export default function Header({ cartCount = 0 }) {
             >
               <span style={{ display: "block", width: "28px", height: "1.5px", background: "#c9b99a", transition: "all 0.3s" }} />
               <span style={{ display: "block", width: "20px", height: "1.5px", background: "#c9973a", transition: "all 0.3s" }} />
-              <span style={{ display: "block", width: "24px", height: "1.5px", background: "#c9b99a", transition: "all 0.3s" }} />
+              <span style={{ block: "block", width: "24px", height: "1.5px", background: "#c9b99a", transition: "all 0.3s" }} />
             </button>
 
+            {/* 👑 DESKTOP NAV: शुरुआती स्लैश (/) हटाकर रिलैटिव बनाए गए राउट्स */}
             <nav style={{ display: "none", alignItems: "center", gap: "36px" }} className="hdr-desktop-nav">
-              <Link to="/products" className={`hdr-nav-link ${location.pathname === "/products" ? "active" : ""}`}>
+              <Link to="products" className={`hdr-nav-link ${location.pathname.includes("products") ? "active" : ""}`}>
                 Shop All
               </Link>
-              <Link to="/about-us" className={`hdr-nav-link ${location.pathname === "/about-us" ? "active" : ""}`}>
+              <Link to="about-us" className={`hdr-nav-link ${location.pathname.includes("about-us") ? "active" : ""}`}>
                 Our Story
               </Link>
-              <Link to="/contact" className={`hdr-nav-link ${location.pathname === "/contact" ? "active" : ""}`}>
+              <Link to="contact" className={`hdr-nav-link ${location.pathname.includes("contact") ? "active" : ""}`}>
                 Bespoke &amp; Contact
               </Link>
             </nav>
           </div>
 
-          {/* LOGO */}
+          {/* LOGO LINK */}
           <Link
-            to="/"
-            style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}
+            to="" // 👑 रिलैटिव पाथ (होमपेज के लिए खाली स्ट्रिंग या सिर्फ डॉट)
+            style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", textDecoration: "none", display: "flex", alignItems: "center", justify: "center" }}
           >
             <img
-  src={logoImg}
-  alt="Netanis Jewelos"
-  style={{
-    height: "52px",
-    width: "auto",
-    objectFit: "contain",
-
-    // REMOVE WHITE BACKGROUND EFFECT
-    mixBlendMode: "screen",
-
-    // PREMIUM GOLD LOOK
-    filter: `
-      brightness(1.18)
-      contrast(1.2)
-      drop-shadow(0 0 10px rgba(201,151,58,0.35))
-      drop-shadow(0 0 22px rgba(201,151,58,0.18))
-    `,
-
-    // BETTER RENDERING
-    imageRendering: "auto",
-
-    transition: "all 0.4s ease",
-  }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.transform = "scale(1.04)";
-    e.currentTarget.style.filter = `
-      brightness(1.28)
-      contrast(1.25)
-      drop-shadow(0 0 16px rgba(201,151,58,0.55))
-      drop-shadow(0 0 34px rgba(201,151,58,0.28))
-    `;
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.transform = "scale(1)";
-    e.currentTarget.style.filter = `
-      brightness(1.18)
-      contrast(1.2)
-      drop-shadow(0 0 10px rgba(201,151,58,0.35))
-      drop-shadow(0 0 22px rgba(201,151,58,0.18))
-    `;
-  }}
-/>
+              src={logoImg}
+              alt="Netanis Jewelos"
+              style={{
+                height: "52px",
+                width: "auto",
+                objectFit: "contain",
+                mixBlendMode: "screen",
+                filter: `
+                  brightness(1.18)
+                  contrast(1.2)
+                  drop-shadow(0 0 10px rgba(201,151,58,0.35))
+                  drop-shadow(0 0 22px rgba(201,151,58,0.18))
+                `,
+                imageRendering: "auto",
+                transition: "all 0.4s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "scale(1.04)";
+                e.currentTarget.style.filter = `
+                  brightness(1.28)
+                  contrast(1.25)
+                  drop-shadow(0 0 16px rgba(201,151,58,0.55))
+                  drop-shadow(0 0 34px rgba(201,151,58,0.28))
+                `;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.filter = `
+                  brightness(1.18)
+                  contrast(1.2)
+                  drop-shadow(0 0 10px rgba(201,151,58,0.35))
+                  drop-shadow(0 0 22px rgba(201,151,58,0.18))
+                `;
+              }}
+            />
           </Link>
 
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-            <a
-              href="/admin"
-              target="_blank"
-              rel="noopener noreferrer"
+            {/* 👑 OWNER CONTROL DESK: <a> टैग को <Link> में बदला और स्लैश हटाकर रिलैटिव पाथ सेट किया */}
+            <Link
+              to="admin"
               title="Owner Control Desk"
               style={{ color: "#8b6f4e", transition: "color 0.3s", padding: "6px" }}
               onMouseEnter={e => e.currentTarget.style.color = "#c9973a"}
@@ -197,10 +190,11 @@ export default function Header({ cartCount = 0 }) {
               <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-            </a>
+            </Link>
 
+            {/* 👑 CART LINK: शुरुआती स्लैश हटाया */}
             <Link
-              to="/cart"
+              to="cart"
               style={{ position: "relative", color: "#c9b99a", transition: "color 0.3s", padding: "6px" }}
               onMouseEnter={e => e.currentTarget.style.color = "#c9973a"}
               onMouseLeave={e => e.currentTarget.style.color = "#c9b99a"}
@@ -251,7 +245,7 @@ export default function Header({ cartCount = 0 }) {
               overflow: "hidden",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "28px 32px", borderBottom: "1px solid rgba(201,183,154,0.1)" }}>
+            <div style={{ display: "flex", alignItems: "center", justify: "space-between", padding: "28px 32px", borderBottom: "1px solid rgba(201,183,154,0.1)" }}>
               <span style={{ fontSize: "9px", letterSpacing: "0.5em", color: "rgba(201,183,154,0.4)", textTransform: "uppercase" }}>Menu</span>
               <button
                 onClick={() => setMenuOpen(false)}
@@ -263,11 +257,11 @@ export default function Header({ cartCount = 0 }) {
 
             <nav style={{ flex: 1, padding: "48px 32px", display: "flex", flexDirection: "column", gap: "0" }}>
               {[
-                { to: "/", label: "Home", num: "01" },
-                { to: "/products", label: "Shop All", num: "02" },
-                { to: "/about-us", label: "Our Story", num: "03" },
-                { to: "/contact", label: "Bespoke & Contact", num: "04" },
-                { to: "/cart", label: "Cart", num: "05" },
+                { to: "", label: "Home", num: "01" }, // 👑 रिलैटिव होमपेज पाथ
+                { to: "products", label: "Shop All", num: "02" },
+                { to: "about-us", label: "Our Story", num: "03" },
+                { to: "contact", label: "Bespoke & Contact", num: "04" },
+                { to: "cart", label: "Cart", num: "05" },
               ].map(({ to, label, num }) => (
                 <Link
                   key={to}
@@ -289,21 +283,21 @@ export default function Header({ cartCount = 0 }) {
                 <p style={{ fontSize: "9px", letterSpacing: "0.3em", color: "rgba(201,183,154,0.2)", textTransform: "uppercase" }}>Bikaner, Rajasthan</p>
               </div>
               <img
-  src={logoImg}
-  alt=""
-  style={{
-    height: "34px",
-    width: "auto",
-    objectFit: "contain",
-    mixBlendMode: "screen",
-    opacity: 0.92,
-    filter: `
-      brightness(1.15)
-      contrast(1.18)
-      drop-shadow(0 0 10px rgba(201,151,58,0.22))
-    `,
-  }}
-/>
+                src={logoImg}
+                alt=""
+                style={{
+                  height: "34px",
+                  width: "auto",
+                  objectFit: "contain",
+                  mixBlendMode: "screen",
+                  opacity: 0.92,
+                  filter: `
+                    brightness(1.15)
+                    contrast(1.18)
+                    drop-shadow(0 0 10px rgba(201,151,58,0.22))
+                  `,
+                }}
+              />
             </div>
 
             <div style={{ position: "absolute", right: "20px", top: "50%", transform: "translateY(-50%) rotate(90deg)", fontFamily: "'DM Mono', monospace", fontSize: "8px", letterSpacing: "0.5em", color: "rgba(201,183,154,0.08)", textTransform: "uppercase", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }}>
