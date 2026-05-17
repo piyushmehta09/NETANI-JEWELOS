@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import logoImg from "/src/assets/netani.png";
+import logoImg from "/src/assets/netanilogo-removebg-preview.png";
 
 const TICKER_ITEMS = ["22K Hallmarked Gold", "GIA Certified", "Free Insured Delivery", "Bespoke Commissions", "Lifetime Service", "Heritage Craftsmanship"];
 
@@ -69,19 +69,13 @@ export default function Header({ cartCount = 0 }) {
           -webkit-text-fill-color: transparent;
           background-clip: text;
         }
-        .hdr-cart-pulse::before {
-          content: '';
-          position: absolute; inset: 0;
-          border-radius: 50%;
-          background: #c9973a;
-          animation: pulse 2s ease-out infinite;
-        }
         @keyframes pulse {
           0%   { transform: scale(1); opacity: 0.6; }
           100% { transform: scale(2.2); opacity: 0; }
         }
       `}</style>
 
+      {/* TOP ANNOUNCEMENT TICKER BAR */}
       <div className="hdr-font-mono" style={{ backgroundColor: "#2a1a0e", borderBottom: "1px solid rgba(201,183,154,0.15)", height: "34px", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 2rem", position: "relative", zIndex: 60 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           <div style={{ width: "24px", height: "1px", background: "#c9973a" }} />
@@ -94,13 +88,14 @@ export default function Header({ cartCount = 0 }) {
             className="hdr-ticker-in"
             style={{ fontSize: "9px", letterSpacing: "0.4em", color: "#c9973a", textTransform: "uppercase", whiteSpace: "nowrap" }}
           >
-            ✦ &nbsp;{TICKER_ITEMS[tickerIdx]}&nbsp; ✦
+            {"\u2736"} &nbsp;{TICKER_ITEMS[tickerIdx]}&nbsp; {"\u2736"}
           </span>
         </div>
 
         <span style={{ fontSize: "9px", letterSpacing: "0.4em", color: "rgba(201,183,154,0.4)", textTransform: "uppercase" }}>Bikaner, Rajasthan</span>
       </div>
 
+      {/* MAIN LOGO & NAVIGATION HEADER */}
       <header
         style={{
           position: "sticky",
@@ -130,40 +125,63 @@ export default function Header({ cartCount = 0 }) {
               <Link to="/products" className={`hdr-nav-link ${location.pathname === "/products" ? "active" : ""}`}>
                 Shop All
               </Link>
+              <Link to="/about-us" className={`hdr-nav-link ${location.pathname === "/about-us" ? "active" : ""}`}>
+                Our Story
+              </Link>
               <Link to="/contact" className={`hdr-nav-link ${location.pathname === "/contact" ? "active" : ""}`}>
                 Bespoke &amp; Contact
               </Link>
             </nav>
           </div>
 
+          {/* LOGO */}
           <Link
             to="/"
             style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}
           >
-            <div style={{
-              border: "1px solid rgba(201,151,58,0.35)",
-              padding: "10px 20px",
-              display: "flex",
-              alignItems: "center",
-              justify: "center",
-              background: "rgba(255,255,255,0.03)",
-              transition: "border-color 0.5s, background 0.5s",
-              position: "relative",
-            }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(201,151,58,0.8)"; e.currentTarget.style.background = "rgba(201,151,58,0.06)"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(201,151,58,0.35)"; e.currentTarget.style.background = "rgba(255,255,255,0.03)"; }}
-            >
-              <span style={{ position: "absolute", top: "-1px", left: "-1px", width: "8px", height: "8px", borderTop: "2px solid #c9973a", borderLeft: "2px solid #c9973a" }} />
-              <span style={{ position: "absolute", top: "-1px", right: "-1px", width: "8px", height: "8px", borderTop: "2px solid #c9973a", borderRight: "2px solid #c9973a" }} />
-              <span style={{ position: "absolute", bottom: "-1px", left: "-1px", width: "8px", height: "8px", borderBottom: "2px solid #c9973a", borderLeft: "2px solid #c9973a" }} />
-              <span style={{ position: "absolute", bottom: "-1px", right: "-1px", width: "8px", height: "8px", borderBottom: "2px solid #c9973a", borderRight: "2px solid #c9973a" }} />
+            <img
+  src={logoImg}
+  alt="Netanis Jewelos"
+  style={{
+    height: "52px",
+    width: "auto",
+    objectFit: "contain",
 
-              <img
-                src={logoImg}
-                alt="Netanis Jewelos"
-                style={{ height: "44px", width: "auto", objectFit: "contain", filter: "brightness(1.05)" }}
-              />
-            </div>
+    // REMOVE WHITE BACKGROUND EFFECT
+    mixBlendMode: "screen",
+
+    // PREMIUM GOLD LOOK
+    filter: `
+      brightness(1.18)
+      contrast(1.2)
+      drop-shadow(0 0 10px rgba(201,151,58,0.35))
+      drop-shadow(0 0 22px rgba(201,151,58,0.18))
+    `,
+
+    // BETTER RENDERING
+    imageRendering: "auto",
+
+    transition: "all 0.4s ease",
+  }}
+  onMouseEnter={(e) => {
+    e.currentTarget.style.transform = "scale(1.04)";
+    e.currentTarget.style.filter = `
+      brightness(1.28)
+      contrast(1.25)
+      drop-shadow(0 0 16px rgba(201,151,58,0.55))
+      drop-shadow(0 0 34px rgba(201,151,58,0.28))
+    `;
+  }}
+  onMouseLeave={(e) => {
+    e.currentTarget.style.transform = "scale(1)";
+    e.currentTarget.style.filter = `
+      brightness(1.18)
+      contrast(1.2)
+      drop-shadow(0 0 10px rgba(201,151,58,0.35))
+      drop-shadow(0 0 22px rgba(201,151,58,0.18))
+    `;
+  }}
+/>
           </Link>
 
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
@@ -210,6 +228,7 @@ export default function Header({ cartCount = 0 }) {
         <style>{`.hdr-desktop-nav { display: none !important; } @media(min-width:768px){ .hdr-desktop-nav { display: flex !important; } }`}</style>
       </header>
 
+      {/* MOBILE DRAWER SIDE NAVIGATION */}
       {menuOpen && (
         <>
           <div
@@ -232,45 +251,59 @@ export default function Header({ cartCount = 0 }) {
               overflow: "hidden",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", justify: "space-between", padding: "28px 32px", borderBottom: "1px solid rgba(201,183,154,0.1)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "28px 32px", borderBottom: "1px solid rgba(201,183,154,0.1)" }}>
               <span style={{ fontSize: "9px", letterSpacing: "0.5em", color: "rgba(201,183,154,0.4)", textTransform: "uppercase" }}>Menu</span>
               <button
                 onClick={() => setMenuOpen(false)}
-                style={{ width: "36px", height: "36px", borderRadius: "50%", background: "rgba(201,183,154,0.08)", border: "1px solid rgba(201,183,154,0.15)", color: "#c9b99a", cursor: "pointer", display: "flex", alignItems: "center", justify: "center", fontSize: "14px", transition: "all 0.3s" }}
+                style={{ width: "36px", height: "36px", borderRadius: "50%", background: "rgba(201,183,154,0.08)", border: "1px solid rgba(201,183,154,0.15)", color: "#c9b99a", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "14px", transition: "all 0.3s" }}
                 onMouseEnter={e => { e.currentTarget.style.background = "#8b3a1e"; e.currentTarget.style.color = "#f5efe6"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = "rgba(201,183,154,0.08)"; e.currentTarget.style.color = "#c9b99a"; }}
-              >✕</button>
+              >&#x2715;</button>
             </div>
 
             <nav style={{ flex: 1, padding: "48px 32px", display: "flex", flexDirection: "column", gap: "0" }}>
               {[
                 { to: "/", label: "Home", num: "01" },
                 { to: "/products", label: "Shop All", num: "02" },
-                { to: "/contact", label: "Bespoke & Contact", num: "03" },
-                { to: "/cart", label: "Cart", num: "04" },
+                { to: "/about-us", label: "Our Story", num: "03" },
+                { to: "/contact", label: "Bespoke & Contact", num: "04" },
+                { to: "/cart", label: "Cart", num: "05" },
               ].map(({ to, label, num }) => (
                 <Link
                   key={to}
                   to={to}
-                  style={{ display: "flex", alignItems: "baseline", gap: "20px", padding: "20px 0", borderBottom: "1px solid rgba(201,183,154,0.08)", textDecoration: "none", transition: "all 0.4s", group: true }}
+                  style={{ display: "flex", alignItems: "baseline", gap: "20px", padding: "20px 0", borderBottom: "1px solid rgba(201,183,154,0.08)", textDecoration: "none", transition: "all 0.4s" }}
                   onMouseEnter={e => { e.currentTarget.querySelector(".drawer-num").style.color = "#c9973a"; e.currentTarget.querySelector(".drawer-label").style.color = "#f5efe6"; e.currentTarget.querySelector(".drawer-arrow").style.opacity = "1"; e.currentTarget.querySelector(".drawer-arrow").style.transform = "translateX(0)"; }}
                   onMouseLeave={e => { e.currentTarget.querySelector(".drawer-num").style.color = "rgba(201,151,58,0.3)"; e.currentTarget.querySelector(".drawer-label").style.color = "#c9b99a"; e.currentTarget.querySelector(".drawer-arrow").style.opacity = "0"; e.currentTarget.querySelector(".drawer-arrow").style.transform = "translateX(-8px)"; }}
                 >
                   <span className="drawer-num" style={{ fontFamily: "'Playfair Display', serif", fontSize: "13px", fontStyle: "italic", color: "rgba(201,151,58,0.3)", minWidth: "28px", transition: "color 0.4s" }}>{num}</span>
                   <span className="drawer-label" style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(1.6rem, 5vw, 2.2rem)", fontWeight: 700, color: "#c9b99a", letterSpacing: "-0.01em", transition: "color 0.4s", flex: 1 }}>{label}</span>
-                  <span className="drawer-arrow" style={{ color: "#c9973a", opacity: 0, transform: "translateX(-8px)", transition: "all 0.4s", fontSize: "20px" }}>→</span>
+                  <span className="drawer-arrow" style={{ color: "#c9973a", opacity: 0, transform: "translateX(-8px)", transition: "all 0.4s", fontSize: "20px" }}>{"\u2192"}</span>
                 </Link>
               ))}
             </nav>
 
-            <div style={{ padding: "28px 32px", borderTop: "1px solid rgba(201,183,154,0.1)", display: "flex", alignItems: "center", justify: "space-between" }}>
+            <div style={{ padding: "28px 32px", borderTop: "1px solid rgba(201,183,154,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
                 <p style={{ fontSize: "9px", letterSpacing: "0.4em", color: "rgba(201,183,154,0.35)", textTransform: "uppercase", marginBottom: "4px" }}>Netanis Jewelos</p>
                 <p style={{ fontSize: "9px", letterSpacing: "0.3em", color: "rgba(201,183,154,0.2)", textTransform: "uppercase" }}>Bikaner, Rajasthan</p>
               </div>
-              <div style={{ width: "36px", height: "36px", border: "1px solid rgba(201,151,58,0.3)", display: "flex", alignItems: "center", justify: "center" }}>
-                <img src={logoImg} alt="" style={{ height: "22px", width: "auto", objectFit: "contain", opacity: 0.7 }} />
-              </div>
+              <img
+  src={logoImg}
+  alt=""
+  style={{
+    height: "34px",
+    width: "auto",
+    objectFit: "contain",
+    mixBlendMode: "screen",
+    opacity: 0.92,
+    filter: `
+      brightness(1.15)
+      contrast(1.18)
+      drop-shadow(0 0 10px rgba(201,151,58,0.22))
+    `,
+  }}
+/>
             </div>
 
             <div style={{ position: "absolute", right: "20px", top: "50%", transform: "translateY(-50%) rotate(90deg)", fontFamily: "'DM Mono', monospace", fontSize: "8px", letterSpacing: "0.5em", color: "rgba(201,183,154,0.08)", textTransform: "uppercase", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }}>

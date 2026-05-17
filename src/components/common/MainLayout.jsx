@@ -3,6 +3,83 @@ import Header from "./Header";
 import { Outlet } from "react-router-dom";
 import Footer from "./Footer";
 
+// ════════ 🛠️ प्रीमियम ग्लोबल प्री-लोडर कंपोनेंट ════════
+function GlobalLoader() {
+  const [isVisible, setIsVisible] = useState(true);
+  const [isRendered, setIsRendered] = useState(true);
+
+  useEffect(() => {
+    // 2.5 सेकंड बाद स्मूथ फेड-आउट एनीमेशन शुरू होगा
+    const fadeTimeout = setTimeout(() => {
+      setIsVisible(false);
+    }, 2500);
+
+    // 3.0 सेकंड बाद कंपोनेंट DOM से पूरी तरह अनमाउंट हो जाएगा
+    const removeTimeout = setTimeout(() => {
+      setIsRendered(false);
+    }, 3000);
+
+    return () => {
+      clearTimeout(fadeTimeout);
+      clearTimeout(removeTimeout);
+    };
+  }, []);
+
+  if (!isRendered) return null;
+
+  return (
+    <div 
+      className="fixed inset-0 z-[99999] flex flex-col items-center justify-center transition-all duration-500 ease-out"
+      style={{ 
+        backgroundColor: "#1a0f08",
+        opacity: isVisible ? 1 : 0,
+        pointerEvents: isVisible ? "all" : "none"
+      }}
+    >
+      <style>{`
+        @keyframes global-gold-spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes global-pulse {
+          0%, 100% { opacity: 0.3; transform: scale(0.98); }
+          50% { opacity: 1; transform: scale(1); }
+        }
+        .global-premium-spinner {
+          width: 80px;
+          height: 80px;
+          border: 2px solid rgba(201, 151, 58, 0.1);
+          border-top: 2px solid #c9973a;
+          border-right: 2px solid #e4b84d;
+          border-radius: 50%;
+          animation: global-gold-spin 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        .global-brand-stamp {
+          animation: global-pulse 2s infinite ease-in-out;
+        }
+      `}</style>
+
+      <div className="relative flex items-center justify-center mb-6">
+        <div className="global-premium-spinner"></div>
+        <span className="absolute font-serif italic text-xl text-[#c9973a] font-bold select-none pointer-events-none">
+          N
+        </span>
+      </div>
+
+      <div className="global-brand-stamp text-center space-y-1.5">
+        <h2 className="font-serif tracking-[0.25em] text-[#f5efe6] uppercase text-xs font-bold">
+          Netanis Jewelos
+        </h2>
+        <div className="w-10 h-[1px] bg-[#c9973a] mx-auto opacity-60" />
+        <p className="font-mono text-[8px] tracking-[0.4em] uppercase text-[#c9b99a]/40 pt-1">
+          ✦ Opening Showroom Vaults ✦
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ════════ 📦 स्टेटिक इनिशियल डेटा कांस्टेंट्स ════════
 const INITIAL_PRODUCTS = [
   { id: 1, name: "Solitaire Imperial Diamond Ring", price: 4500, rating: 5.0, image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500", category: "Rings", purity: "18K", isFeatured: true },
   { id: 2, name: "Sovereign Heritage Choker", price: 12500, rating: 4.9, image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500", category: "Necklaces", purity: "24K", isFeatured: true },
@@ -40,6 +117,7 @@ const INITIAL_TESTIMONIALS = [
   { id: 2, name: "Devendra Singh Rajput", location: "Mumbai", text: "Bespoke service at its finest. The 18K micro-prong solitaire engagement ring is structurally pristine." }
 ];
 
+// ════════ 🔲 MAIN LAYOUT EXPORT ════════
 export default function MainLayout() {
   const [products, setProducts] = useState(() => {
     const saved = localStorage.getItem("netanis_products");
@@ -115,6 +193,10 @@ export default function MainLayout() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0e0d0c] text-stone-200 font-sans selection:bg-amber-800 relative">
+      
+      {/* ── 🌟 वैश्विक लग्जरी प्री-लोडर की लेयर ── */}
+      <GlobalLoader />
+
       <Header cartCount={cart.reduce((t, i) => t + i.quantity, 0)} />
       <main className="flex-grow">
         <Outlet context={{ cart, clearCart, onAddToCart: handleAddToCart, updateQuantity, removeProduct, products, setProducts, homeContent, setHomeContent, karatMeta, setKaratMeta, testimonials, setTestimonials }} />

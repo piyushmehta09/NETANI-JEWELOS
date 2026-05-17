@@ -46,18 +46,26 @@ export default function Admin() {
     { id: "ORD-9980", patron: "Sunita Choudhary", total: 950, status: "Pending", payment: "Unpaid", date: "2026-05-14" }
   ]);
 
+  // ── 🔒 एनवायरनमेंट वेरिएबल आधारित लॉगिन सबमिशन हैंडलर ──
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    if (passwordInput === "netani2026") {
+    
+    // सुरक्षित .env वेरिएबल्स मैपिंग (लोकल में .env.local और प्रोडक्शन में GitHub Secrets से लोड होगा)
+    const MASTER_TOKEN = import.meta.env.VITE_ADMIN_PASSWORD || "netani2026";
+    const MANAGER_TOKEN = import.meta.env.VITE_MANAGER_PASSWORD || "manager2026";
+    const STAFF_TOKEN = import.meta.env.VITE_STAFF_PASSWORD || "staff2026";
+    const SUPPORT_TOKEN = import.meta.env.VITE_SUPPORT_PASSWORD || "support2026";
+
+    if (passwordInput === MASTER_TOKEN) {
       setIsAuthorized(true);
       setCurrentRole(ADMIN_ROLES.SUPER_ADMIN);
-    } else if (passwordInput === "manager2026") {
+    } else if (passwordInput === MANAGER_TOKEN) {
       setIsAuthorized(true);
       setCurrentRole(ADMIN_ROLES.MANAGER);
-    } else if (passwordInput === "staff2026") {
+    } else if (passwordInput === STAFF_TOKEN) {
       setIsAuthorized(true);
       setCurrentRole(ADMIN_ROLES.STAFF);
-    } else if (passwordInput === "support2026") {
+    } else if (passwordInput === SUPPORT_TOKEN) {
       setIsAuthorized(true);
       setCurrentRole(ADMIN_ROLES.SUPPORT);
     } else {
@@ -320,7 +328,7 @@ export default function Admin() {
                     <label className="text-[10px] font-bold text-[#8b3a1e] block">Pin as Featured Masterpiece</label>
                     <span className="text-[8px] text-stone-500 block">Conveyor exhibition visibility</span>
                   </div>
-                  <input type="checkbox" checked={formValues.isFeatured} onChange={(e) => setFormValues({...formValues, isFeatured: e.checked})} className="w-4 h-4 accent-[#8b3a1e]" />
+                  <input type="checkbox" checked={formValues.isFeatured} onChange={(e) => setFormValues({...formValues, isFeatured: e.target.checked})} className="w-4 h-4 accent-[#8b3a1e]" />
                 </div>
                 <div className="flex gap-2 pt-2">
                   <button type="submit" className="flex-grow bg-[#2a1a0e] hover:bg-[#8b3a1e] text-[#f5efe6] font-bold py-3.5 uppercase tracking-widest transition duration-300">

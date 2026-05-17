@@ -219,7 +219,7 @@ export default function Footer() {
               <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#25d366", flexShrink: 0 }} className="ftr-pulse" />
               <div>
                 <p className="ftr-mono" style={{ fontSize: "9px", letterSpacing: "0.4em", color: "#c9973a", textTransform: "uppercase", margin: 0 }}>Chat with Us</p>
-                <p className="ftr-mono" style={{ fontSize: "9px", color: "#8b6f4e", margin: "3px 0 0" }}>+91 63780 20272</p>
+                <p className="ftr-mono" style={{ fontSize: "9px", color: "#8b6f4e", margin: "3px 0 0" }}>+919321387018</p>
               </div>
               <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#c9973a" strokeWidth="2" style={{ marginLeft: "auto" }}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />

@@ -6,44 +6,234 @@ const PURITIES = ["All", "24K", "22K", "18K", "14K"];
 
 function VirtualTryOnModal({ product, onClose }) {
   const videoRef = useRef(null);
-  const [streamActive, setStreamActive] = useState(false);
+  const canvasRef = useRef(null);
+  const [loading, setLoading] = useState(true);
+  const [modelLoaded, setModelLoaded] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState("Initializing Vault Matrix...");
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          setStreamActive(true);
-        }
-      })
-      .catch(err => console.error("Camera access denied", err));
-
-    return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const tracks = videoRef.current.srcObject.getTracks();
-        tracks.forEach(track => track.stop());
+    const loadScripts = async () => {
+      setProcessingStatus("Loading AI Vision Systems...");
+      if (window.FaceMesh) {
+        setModelLoaded(true);
+        return;
       }
+      const createScript = (src) => {
+        return new Promise((resolve) => {
+          const script = document.createElement("script");
+          script.src = src;
+          script.crossOrigin = "anonymous";
+          script.onload = () => resolve();
+          document.head.appendChild(script);
+        });
+      };
+      await createScript("https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js");
+      await createScript("https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js");
+      setModelLoaded(true);
     };
+    loadScripts();
   }, []);
 
+  useEffect(() => {
+    if (!modelLoaded) return;
+
+    let camera = null;
+    let activeStream = null;
+    const videoElement = videoRef.current;
+    const canvasElement = canvasRef.current;
+    const canvasCtx = canvasElement.getContext("2d");
+
+    // ── क्रोमा-कीइंग बैकग्राउंड रिमूवर इंजन ──
+    const rawJewelryImg = new Image();
+    const processedJewelryCanvas = document.createElement("canvas");
+    const pCtx = processedJewelryCanvas.getContext("2d");
+    let jewelryReady = false;
+
+    rawJewelryImg.crossOrigin = "anonymous";
+    rawJewelryImg.src = product.image;
+    
+    rawJewelryImg.onload = () => {
+      setProcessingStatus("Isolating Jewelry Vectors...");
+      processedJewelryCanvas.width = rawJewelryImg.width;
+      processedJewelryCanvas.height = rawJewelryImg.height;
+      
+      pCtx.drawImage(rawJewelryImg, 0, 0);
+      
+      try {
+        const imgData = pCtx.getImageData(0, 0, processedJewelryCanvas.width, processedJewelryCanvas.height);
+        const data = imgData.data;
+        
+        // कॉर्नर पिक्सेल के रंग को बेस कलर (सफ़ेद/ग्रे) मानना
+        const rTarget = data[0], gTarget = data[1], bTarget = data[2];
+        const threshold = 45; // संवेदनशीलता (Sensitivity Metric)
+
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i], g = data[i+1], b = data[i+2];
+          
+          // चेक करना कि क्या यह पिक्सेल बैकग्राउंड कलर या ऑफ़-व्हाइट रेंज में है
+          const matchTarget = Math.abs(r - rTarget) < threshold && Math.abs(g - gTarget) < threshold && Math.abs(b - bTarget) < threshold;
+          const isWhiteGreyRange = r > 190 && g > 190 && b > 190; // सामान्य वाइट/ग्रे शेड्स
+
+          if (matchTarget || isWhiteGreyRange) {
+            data[i + 3] = 0; // पिक्सेल को पूरी तरह ट्रांसपेरेंट बनाना
+          }
+        }
+        pCtx.putImageData(imgData, 0, 0);
+      } catch (e) {
+        console.error("Local matrix bypass applied due to CORS. Using fallback layer.");
+      }
+      jewelryReady = true;
+      setProcessingStatus("Calibrating Anchors...");
+    };
+
+    function onResults(results) {
+      if (loading) setLoading(false);
+
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      canvasCtx.save();
+      
+      canvasCtx.translate(canvasElement.width, 0);
+      canvasCtx.scale(-1, 1);
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+      if (jewelryReady && results.multiFaceLandmarks && results.multiFaceLandmarks.length > 0) {
+        const landmarks = results.multiFaceLandmarks[0];
+
+        const chin = landmarks[152];
+        const forehead = landmarks[10];
+        const leftCheek = landmarks[234];
+        const rightCheek = landmarks[454];
+
+        const chinX = (1 - chin.x) * canvasElement.width;
+        const chinY = chin.y * canvasElement.height;
+        const foreheadY = forehead.y * canvasElement.height;
+        
+        const faceHeight = Math.abs(chinY - foreheadY);
+        const faceWidth = Math.abs(((1 - leftCheek.x) * canvasElement.width) - ((1 - rightCheek.x) * canvasElement.width));
+
+        const angle = Math.atan2(
+          landmarks[454].y - landmarks[234].y,
+          landmarks[454].x - landmarks[234].x
+        );
+
+        let targetX = chinX;
+        let targetY = chinY;
+        let imgWidth = faceWidth;
+
+        if (product.category === "Necklaces") {
+          targetY = chinY + (faceHeight * 0.45); 
+          imgWidth = faceWidth * 1.7; 
+        } else if (product.category === "Earrings") {
+          targetY = chinY;
+          imgWidth = faceWidth * 1.2;
+        } else {
+          targetY = chinY + (faceHeight * 0.2);
+          imgWidth = faceWidth * 0.9;
+        }
+
+        const imgHeight = imgWidth * (processedJewelryCanvas.height / processedJewelryCanvas.width || 1);
+
+        canvasCtx.translate(targetX, targetY);
+        canvasCtx.rotate(-angle);
+        
+        canvasCtx.drawImage(
+          processedJewelryCanvas, 
+          -imgWidth / 2, 
+          -imgHeight / 3, 
+          imgWidth, 
+          imgHeight
+        );
+      }
+      canvasCtx.restore();
+    }
+
+    const faceMesh = new window.FaceMesh({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`,
+    });
+
+    faceMesh.setOptions({
+      maxNumFaces: 1,
+      refineLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+    faceMesh.onResults(onResults);
+
+    navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } })
+      .then((stream) => {
+        activeStream = stream;
+        videoElement.srcObject = stream;
+        camera = new window.Camera(videoElement, {
+          onFrame: async () => {
+            await faceMesh.send({ image: videoElement });
+          },
+          width: 640,
+          height: 480,
+        });
+        camera.start();
+      })
+      .catch((err) => {
+        console.error("Camera channel failed:", err);
+        setLoading(false);
+      });
+
+    return () => {
+      if (camera) camera.stop();
+      if (activeStream) {
+        activeStream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [modelLoaded]);
+
   return (
-    <div className="fixed inset-0 z-[600] flex items-center justify-center p-4" style={{ backgroundColor: "rgba(42,26,14,0.9)", backdropFilter: "blur(20px)" }}>
-      <div className="relative w-full max-w-2xl bg-[#f5efe6] border border-[#c9b99a]/60 p-6 shadow-[0_32px_80px_rgba(0,0,0,0.6)]" style={{ borderRadius: "2px" }}>
-        <button onClick={onClose} className="absolute top-4 right-4 z-50 w-9 h-9 bg-[#2a1a0e] hover:bg-[#8b3a1e] text-[#f5efe6] flex items-center justify-center font-mono text-xs rounded-full">✕</button>
+    <div className="fixed inset-0 z-[600] flex items-center justify-center p-4" style={{ backgroundColor: "rgba(26,15,8,0.94)", backdropFilter: "blur(24px)" }}>
+      
+      {/* प्रीमियम सीएसएस एलीमेंट्स */}
+      <style>{`
+        @keyframes gold-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes pulse-txt { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        .premium-spinner {
+          width: 60px; height: 60px;
+          border: 2px solid rgba(201, 151, 58, 0.15);
+          border-top: 2px solid #c9973a;
+          border-right: 2px solid #e4b84d;
+          border-radius: 50%;
+          animation: gold-spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        .pulse-loading-text { animation: pulse-txt 1.8s infinite ease-in-out; }
+      `}</style>
+
+      <div className="relative w-full max-w-2xl bg-[#f5efe6] border border-[#c9973a]/40 p-6 shadow-[0_40px_90px_rgba(0,0,0,0.75)]" style={{ borderRadius: "2px" }}>
+        
+        <button onClick={onClose} className="absolute top-4 right-4 z-50 w-9 h-9 bg-[#2a1a0e] hover:bg-[#8b3a1e] text-[#f5efe6] flex items-center justify-center font-mono text-xs rounded-full transition-all duration-300 border border-transparent hover:border-[#c9973a]/40 shadow-md">✕</button>
+        
         <div className="text-center mb-4">
-          <span className="font-mono text-[9px] text-[#8b3a1e] tracking-[0.4em] uppercase block">// AR Live Mirror Simulation</span>
-          <h3 className="font-serif text-xl font-bold text-[#2a1a0e] mt-1">Virtual Try-On: {product.name}</h3>
+          <span className="font-mono text-[9px] text-[#8b3a1e] tracking-[0.5em] uppercase block">// Quantum Vision Matrix v2.6</span>
+          <h3 className="font-serif text-xl font-bold text-[#2a1a0e] mt-1 tracking-wide">Bespoke Fitting Room: {product.name}</h3>
         </div>
-        <div className="relative aspect-video bg-black overflow-hidden border border-[#c9b99a]/40 flex items-center justify-center">
-          <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover scale-x-[-1]" />
-          {streamActive && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none animate-pulse">
-              <img src={product.image} alt="" className="w-40 h-40 object-contain drop-shadow-[0_10px_25px_rgba(0,0,0,0.5)] transform translate-y-4" style={{ filter: "sepia(5%) brightness(1.05)" }} />
+
+        <div className="relative aspect-video bg-[#1a0f08] overflow-hidden border border-[#c9b99a]/30 flex items-center justify-center shadow-inner">
+          <video ref={videoRef} className="hidden" playsInline muted />
+          <canvas ref={canvasRef} width="640" height="480" className="w-full h-full object-cover scale-x-[-1]" />
+          
+          {/* लग्जरी सिग्नेचर लोडर स्क्रीन */}
+          {loading && (
+            <div className="absolute inset-0 bg-[#1a0f08] flex flex-col items-center justify-center gap-5 text-[#f5efe6] z-40">
+              <div className="relative flex items-center justify-center">
+                <div className="premium-spinner"></div>
+                <span className="absolute font-serif italic text-[11px] text-[#c9973a] font-bold">N</span>
+              </div>
+              <div className="text-center space-y-1">
+                <p className="font-mono text-[10px] tracking-[0.35em] uppercase text-[#c9973a] pulse-loading-text">✦ ATELIER SECURE LIVE FEED ✦</p>
+                <p className="font-mono text-[8px] tracking-widest text-[#c9b99a]/50 uppercase mt-1">[{processingStatus}]</p>
+              </div>
             </div>
           )}
-          {!streamActive && <p className="text-stone-500 font-mono text-xs">// Initializing secure camera pipeline matrix...</p>}
         </div>
-        <p className="text-center font-mono text-[9px] text-[#8b6f4e] uppercase tracking-wider mt-4">✦ Align your frame position to map the jewelry configuration parameters ✦</p>
+        
+        <p className="text-center font-mono text-[8px] text-[#8b6f4e] uppercase tracking-wider mt-4">
+          ✦ Live smart chroma filtering is active. Face the sensor loop directly under proper lighting matrix ✦
+        </p>
       </div>
     </div>
   );
