@@ -118,27 +118,27 @@ export default function Header({ cartCount = 0 }) {
             >
               <span style={{ display: "block", width: "28px", height: "1.5px", background: "#c9b99a", transition: "all 0.3s" }} />
               <span style={{ display: "block", width: "20px", height: "1.5px", background: "#c9973a", transition: "all 0.3s" }} />
-              <span style={{ block: "block", width: "24px", height: "1.5px", background: "#c9b99a", transition: "all 0.3s" }} />
+              <span style={{ display: "block", width: "24px", height: "1.5px", background: "#c9b99a", transition: "all 0.3s" }} />
             </button>
 
-            {/* 👑 DESKTOP NAV: शुरुआती स्लैश (/) हटाकर रिलैटिव बनाए गए राउट्स */}
+            {/* 👑 DESKTOP NAV: स्लैश के साथ रूट्स और गिटहब-फ्रेंडली एक्टिव स्टेट्स */}
             <nav style={{ display: "none", alignItems: "center", gap: "36px" }} className="hdr-desktop-nav">
-              <Link to="products" className={`hdr-nav-link ${location.pathname.includes("products") ? "active" : ""}`}>
+              <Link to="/products" className={`hdr-nav-link ${location.pathname.endsWith("/products") ? "active" : ""}`}>
                 Shop All
               </Link>
-              <Link to="about-us" className={`hdr-nav-link ${location.pathname.includes("about-us") ? "active" : ""}`}>
+              <Link to="/about-us" className={`hdr-nav-link ${location.pathname.endsWith("/about-us") ? "active" : ""}`}>
                 Our Story
               </Link>
-              <Link to="contact" className={`hdr-nav-link ${location.pathname.includes("contact") ? "active" : ""}`}>
+              <Link to="/contact" className={`hdr-nav-link ${location.pathname.endsWith("/contact") ? "active" : ""}`}>
                 Bespoke &amp; Contact
               </Link>
             </nav>
           </div>
 
-          {/* LOGO LINK */}
+          {/* LOGO */}
           <Link
-            to="" // 👑 रिलैटिव पाथ (होमपेज के लिए खाली स्ट्रिंग या सिर्फ डॉट)
-            style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", textDecoration: "none", display: "flex", alignItems: "center", justify: "center" }}
+            to="/"
+            style={{ position: "absolute", left: "50%", transform: "translateX(-50%)", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center" }}
           >
             <img
               src={logoImg}
@@ -179,9 +179,9 @@ export default function Header({ cartCount = 0 }) {
           </Link>
 
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-            {/* 👑 OWNER CONTROL DESK: <a> टैग को <Link> में बदला और स्लैश हटाकर रिलैटिव पाथ सेट किया */}
+            {/* 👑 OWNER CONTROL DESK: साफ़-साफ़ एब्सोल्यूट पाथवे जो बेसनेम के साथ सिंक होगा */}
             <Link
-              to="admin"
+              to="/admin"
               title="Owner Control Desk"
               style={{ color: "#8b6f4e", transition: "color 0.3s", padding: "6px" }}
               onMouseEnter={e => e.currentTarget.style.color = "#c9973a"}
@@ -192,9 +192,8 @@ export default function Header({ cartCount = 0 }) {
               </svg>
             </Link>
 
-            {/* 👑 CART LINK: शुरुआती स्लैश हटाया */}
             <Link
-              to="cart"
+              to="/cart"
               style={{ position: "relative", color: "#c9b99a", transition: "color 0.3s", padding: "6px" }}
               onMouseEnter={e => e.currentTarget.style.color = "#c9973a"}
               onMouseLeave={e => e.currentTarget.style.color = "#c9b99a"}
@@ -255,13 +254,14 @@ export default function Header({ cartCount = 0 }) {
               >&#x2715;</button>
             </div>
 
+            {/* 👑 MOBILE NAV ARRAY: स्लैश मैपिंग फिक्स */}
             <nav style={{ flex: 1, padding: "48px 32px", display: "flex", flexDirection: "column", gap: "0" }}>
               {[
-                { to: "", label: "Home", num: "01" }, // 👑 रिलैटिव होमपेज पाथ
-                { to: "products", label: "Shop All", num: "02" },
-                { to: "about-us", label: "Our Story", num: "03" },
-                { to: "contact", label: "Bespoke & Contact", num: "04" },
-                { to: "cart", label: "Cart", num: "05" },
+                { to: "/", label: "Home", num: "01" },
+                { to: "/products", label: "Shop All", num: "02" },
+                { to: "/about-us", label: "Our Story", num: "03" },
+                { to: "/contact", label: "Bespoke & Contact", num: "04" },
+                { to: "/cart", label: "Cart", num: "05" },
               ].map(({ to, label, num }) => (
                 <Link
                   key={to}
