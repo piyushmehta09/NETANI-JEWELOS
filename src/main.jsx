@@ -23,14 +23,11 @@ const router = createBrowserRouter([
       { path: "contact", element: <Contact /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Registration /> },
-      { path: "admin", element: <Admin />},
+      { path: "admin", element: <Admin />}, // 👈 यह children वाला ही असली एडमिन पैनल चलाएगा
       { path: "about-us", element: <AboutUs />}
     ],
   },
-  { 
-    path: "/admin",
-    element: <Admin />
-  },
+  // ✂️ नीचे जो एक्स्ट्रा /admin राउट भटक रहा था, उसे यहाँ से पूरी तरह डिलीट कर दिया है।
 ], {
   // ── 🌐 गिटहब सब-फ़ोल्डर राउटिंग को सिंक करने के लिए बेसनेम ──
   basename: "/NETANI-JEWELOS" 
